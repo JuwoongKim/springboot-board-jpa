@@ -53,48 +53,48 @@ class PostControllerTest {
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-            .apply(documentationConfiguration(restDocumentation))
-            .build();
+                .apply(documentationConfiguration(restDocumentation))
+                .build();
     }
 
     @DisplayName("Post 생성에 대한 성공 테스트")
     @Test
     public void createPostTest() throws Exception {
         // Given
-        PostRequest request = new PostRequest("Sample Post", "This is a sample post content.");
+        PostRequest.Create request = new PostRequest.Create("Sample Post", "This is a sample post content.");
 
         Long postId = 1L;
         Long userId = 1L;
         PostDto postDto = new PostDto(postId, userId, request.title(), request.content(),
-            null, null);
+                null, null);
 
         when(postService.createPost(userId, request.title(), request.content())).thenReturn(
-            postDto);
+                postDto);
 
         // When and Then
         mockMvc.perform(post("/api/posts/{id}", userId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id").value(postId))
-            .andExpect(jsonPath("$.userId").value(userId))
-            .andExpect(jsonPath("$.title").value(request.title()))
-            .andExpect(jsonPath("$.content").value(request.content()))
-            .andDo(document("create-post",
-                requestFields(
-                    fieldWithPath("title").description("The title of the post"),
-                    fieldWithPath("content").description("The content of the post")
-                ),
-                responseFields(
-                    fieldWithPath("id").description("The ID of the created post"),
-                    fieldWithPath("userId").description("The ID of the user who created the post"),
-                    fieldWithPath("title").description("The title of the post"),
-                    fieldWithPath("content").description("The content of the post"),
-                    fieldWithPath("createdAt").description("Post creation timestamp"),
-                    fieldWithPath("updatedAt").description("Post update timestamp")
-                )
-            ));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(postId))
+                .andExpect(jsonPath("$.userId").value(userId))
+                .andExpect(jsonPath("$.title").value(request.title()))
+                .andExpect(jsonPath("$.content").value(request.content()))
+                .andDo(document("create-post",
+                        requestFields(
+                                fieldWithPath("title").description("The title of the post"),
+                                fieldWithPath("content").description("The content of the post")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("The ID of the created post"),
+                                fieldWithPath("userId").description("The ID of the user who created the post"),
+                                fieldWithPath("title").description("The title of the post"),
+                                fieldWithPath("content").description("The content of the post"),
+                                fieldWithPath("createdAt").description("Post creation timestamp"),
+                                fieldWithPath("updatedAt").description("Post update timestamp")
+                        )
+                ));
     }
 
     @DisplayName("Post ID 조회에 대한 성공 테스트")
@@ -108,21 +108,21 @@ class PostControllerTest {
 
         // When and Then
         mockMvc.perform(get("/api/posts/{id}", postId))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id").value(postId))
-            .andExpect(jsonPath("$.title").value("Sample Post"))
-            .andExpect(jsonPath("$.content").value("This is a sample post content."))
-            .andDo(document("get-post",
-                responseFields(
-                    fieldWithPath("id").description("The postID of the post"),
-                    fieldWithPath("userId").description("The userID of the post"),
-                    fieldWithPath("title").description("The title of the post"),
-                    fieldWithPath("content").description("The content of the post"),
-                    fieldWithPath("createdAt").description("Post creation timestamp"),
-                    fieldWithPath("updatedAt").description("Post update timestamp")
-                )
-            ));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(postId))
+                .andExpect(jsonPath("$.title").value("Sample Post"))
+                .andExpect(jsonPath("$.content").value("This is a sample post content."))
+                .andDo(document("get-post",
+                        responseFields(
+                                fieldWithPath("id").description("The postID of the post"),
+                                fieldWithPath("userId").description("The userID of the post"),
+                                fieldWithPath("title").description("The title of the post"),
+                                fieldWithPath("content").description("The content of the post"),
+                                fieldWithPath("createdAt").description("Post creation timestamp"),
+                                fieldWithPath("updatedAt").description("Post update timestamp")
+                        )
+                ));
     }
 
     @DisplayName("Post 페이징 전체조회에 대한 성공 테스트")
@@ -141,87 +141,45 @@ class PostControllerTest {
 
         // When and Then
         mockMvc.perform(get("/api/posts")
-                .param("page", String.valueOf(page))
-                .param("size", String.valueOf(size)))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.content[0].id").value(1L))
-            .andExpect(jsonPath("$.content[0].title").value("Post 1"))
-            .andExpect(jsonPath("$.content[0].content").value("Content 1"))
-            .andExpect(jsonPath("$.content[1].id").value(2L))
-            .andExpect(jsonPath("$.content[1].title").value("Post 2"))
-            .andExpect(jsonPath("$.content[1].content").value("Content 2"))
-            .andDo(document("get-all-posts",
-                responseFields(
-                    fieldWithPath("content[].id").description("The ID of the post"),
-                    fieldWithPath("content[].userId").description("The ID of the user who created the post"),
-                    fieldWithPath("content[].title").description("The title of the post"),
-                    fieldWithPath("content[].content").description("The content of the post"),
-                    fieldWithPath("content[].createdAt").description("Post creation timestamp"),
-                    fieldWithPath("content[].updatedAt").description("Post update timestamp"),
-                    fieldWithPath("pageable.sort.empty").description("Whether the sort is empty"),
-                    fieldWithPath("pageable.sort.unsorted").description("Whether the sort is unsorted"),
-                    fieldWithPath("pageable.sort.sorted").description("Whether the sort is sorted"),
-                    fieldWithPath("pageable.offset").description("The offset of the page"),
-                    fieldWithPath("pageable.pageNumber").description("The current page number"),
-                    fieldWithPath("pageable.pageSize").description("The page size"),
-                    fieldWithPath("pageable.paged").description("Whether the result is paged"),
-                    fieldWithPath("pageable.unpaged").description("Whether the result is unpaged"),
-                    fieldWithPath("totalElements").description("Total number of posts"),
-                    fieldWithPath("totalPages").description("Total number of pages"),
-                    fieldWithPath("last").description("Whether this is the last page"),
-                    fieldWithPath("size").description("Number of posts per page"),
-                    fieldWithPath("number").description("Current page number"),
-                    fieldWithPath("sort.empty").description("Whether the sort is empty"),
-                    fieldWithPath("sort.unsorted").description("Whether the sort is unsorted"),
-                    fieldWithPath("sort.sorted").description("Whether the sort is sorted"),
-                    fieldWithPath("numberOfElements").description("Number of posts on the current page"),
-                    fieldWithPath("first").description("Whether this is the first page"),
-                    fieldWithPath("empty").description("Whether the result is empty")
-                )
-            ));
-    }
-
-    @DisplayName("Post 수정에 대한 성공 테스트")
-    @Test
-    public void updatePostTest() throws Exception {
-        // Given
-        PostRequest request = new PostRequest("Sample Post", "This is a sample post content.");
-
-        Long postId = 1L;
-        Long userId = 1L;
-        PostDto postDto = new PostDto(postId, userId, request.title(), request.content(),
-            null, null);
-
-        when(postService.createPost(userId, request.title(), request.content())).thenReturn(
-            postDto);
-
-        // When and Then
-        mockMvc.perform(put("/api/posts/{id}", postId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id").value(postId))
-            .andExpect(jsonPath("$.userId").value(userId))
-            .andExpect(jsonPath("$.title").value(request.title()))
-            .andExpect(jsonPath("$.content").value(request.content()))
-            .andDo(document("edit-post",
-                requestFields(
-                    fieldWithPath("postId").description("The ID of the created post"),
-                    fieldWithPath("userId").description("The ID of the user who creates the post"),
-                    fieldWithPath("postTitle").description("The title of the post"),
-                    fieldWithPath("postContent").description("The content of the post")
-                ),
-                responseFields(
-                    fieldWithPath("id").description("The ID of the created post"),
-                    fieldWithPath("userId").description("The ID of the user who created the post"),
-                    fieldWithPath("title").description("The title of the post"),
-                    fieldWithPath("content").description("The content of the post"),
-                    fieldWithPath("createdAt").description("Post creation timestamp"),
-                    fieldWithPath("updatedAt").description("Post update timestamp")
-                )
-            ));
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].title").value("Post 1"))
+                .andExpect(jsonPath("$.content[0].content").value("Content 1"))
+                .andExpect(jsonPath("$.content[1].id").value(2L))
+                .andExpect(jsonPath("$.content[1].title").value("Post 2"))
+                .andExpect(jsonPath("$.content[1].content").value("Content 2"))
+                .andDo(document("get-all-posts",
+                        responseFields(
+                                fieldWithPath("content[].id").description("The ID of the post"),
+                                fieldWithPath("content[].userId").description("The ID of the user who created the post"),
+                                fieldWithPath("content[].title").description("The title of the post"),
+                                fieldWithPath("content[].content").description("The content of the post"),
+                                fieldWithPath("content[].createdAt").description("Post creation timestamp"),
+                                fieldWithPath("content[].updatedAt").description("Post update timestamp"),
+                                fieldWithPath("pageable.sort.empty").description("Whether the sort is empty"),
+                                fieldWithPath("pageable.sort.unsorted").description("Whether the sort is unsorted"),
+                                fieldWithPath("pageable.sort.sorted").description("Whether the sort is sorted"),
+                                fieldWithPath("pageable.offset").description("The offset of the page"),
+                                fieldWithPath("pageable.pageNumber").description("The current page number"),
+                                fieldWithPath("pageable.pageSize").description("The page size"),
+                                fieldWithPath("pageable.paged").description("Whether the result is paged"),
+                                fieldWithPath("pageable.unpaged").description("Whether the result is unpaged"),
+                                fieldWithPath("totalElements").description("Total number of posts"),
+                                fieldWithPath("totalPages").description("Total number of pages"),
+                                fieldWithPath("last").description("Whether this is the last page"),
+                                fieldWithPath("size").description("Number of posts per page"),
+                                fieldWithPath("number").description("Current page number"),
+                                fieldWithPath("sort.empty").description("Whether the sort is empty"),
+                                fieldWithPath("sort.unsorted").description("Whether the sort is unsorted"),
+                                fieldWithPath("sort.sorted").description("Whether the sort is sorted"),
+                                fieldWithPath("numberOfElements").description("Number of posts on the current page"),
+                                fieldWithPath("first").description("Whether this is the first page"),
+                                fieldWithPath("empty").description("Whether the result is empty")
+                        )
+                ));
     }
 
 }

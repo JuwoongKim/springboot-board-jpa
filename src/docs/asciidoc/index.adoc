@@ -1,0 +1,59 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+
+= Spring REST Docs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[resources-post]]
+== Post
+
+[[resources-post-create]]
+=== Post 생성
+
+==== HTTP request
+include::{snippets}/create-post/http-request.adoc[]
+
+==== HTTP response
+include::{snippets}/create-post/http-response.adoc[]
+
+
+=== Post 조회
+
+==== HTTP request
+include::{snippets}/get-post/http-request.adoc[]
+
+==== HTTP response
+include::{snippets}/get-post/http-response.adoc[]
+
+=== Post 전체조회
+
+==== HTTP request
+include::{snippets}/get-all-posts/http-request.adoc[]
+
+==== HTTP response
+include::{snippets}/get-all-posts/http-response.adoc[]
+
+
+[[resources-user]]
+== User
+
+[[resources-user-create]]
+=== User 생성
+
+==== HTTP request
+include::{snippets}/create-user/http-request.adoc[]
+
+==== HTTP response
+include::{snippets}/create-user/http-response.adoc[]
+
+[[resources-user-get]]
+=== User 조회
+
+==== HTTP request
+include::{snippets}/search-by-user/http-request.adoc[]
+
+==== HTTP response
+include::{snippets}/search-by-user/http-response.adoc[]

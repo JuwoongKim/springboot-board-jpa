@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -29,6 +30,7 @@ import com.juwoong.springbootboardjpa.user.domain.constant.Hobby;
 
 @WebMvcTest
 @AutoConfigureRestDocs
+@MockBean(JpaMetamodelMappingContext.class)
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 class UserControllerTest {
 
@@ -58,10 +60,10 @@ class UserControllerTest {
         Long userId = 1L;
         UserDto userDto = new UserDto(userId, "Juwoong", 30, Hobby.SPORTS, null, null, null);
 
-        when(userService.searchById(userId)).thenReturn(userDto);
+        when(userService.getUser(userId)).thenReturn(userDto);
 
         //when then
-        mockMvc.perform(get("/api/user/search/{id}", userId)
+        mockMvc.perform(get("/api/users/{id}", userId)
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -86,14 +88,14 @@ class UserControllerTest {
     @Test
     public void testCreateUser() throws Exception {
         // given
-        UserRequest request = new UserRequest("Juwoong", 30, Hobby.SPORTS);
+        UserRequest.Create request = new UserRequest.Create("Juwoong", 30, Hobby.SPORTS);
 
         UserDto userDto = new UserDto(1L, "Juwoong", 30, Hobby.SPORTS, null, null, null);
 
         when(userService.createUser("Juwoong", 30, Hobby.SPORTS)).thenReturn(userDto);
 
         // when then
-        mockMvc.perform(post("/api/user/create")
+        mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
